@@ -53,7 +53,7 @@ index 2df55d0..6a328ca 100644
      set(REALM_BUILD_LIB_ONLY ON)
 -    set(REALM_ENABLE_SYNC ON)
 +    set(REALM_ENABLE_SYNC OFF)
-
+ 
      if(ANDROID)
          set(REALM_ANDROID ON)
 diff --git a/node_modules/realm/build/Release/realm.node b/node_modules/realm/build/Release/realm.node
@@ -67,7 +67,7 @@ index 2631a9a..ff33995 100644
 @@ -20,10 +20,10 @@
  #include "node_init.hpp"
  #include "napi.h"
-
+ 
 -#if !REALM_ENABLE_SYNC
 -#pragma comment( lib, "ws2_32.lib")
 -#pragma comment (lib, "crypt32");
@@ -76,5 +76,6 @@ index 2631a9a..ff33995 100644
 +// #pragma comment( lib, "ws2_32.lib")
 +// #pragma comment (lib, "crypt32");
 +// #endif
-
+ 
  #include "js_realm.hpp"
+ 

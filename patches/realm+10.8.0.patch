@@ -1,0 +1,80 @@
+diff --git a/node_modules/realm/CMakeLists.txt b/node_modules/realm/CMakeLists.txt
+index 2df55d0..6a328ca 100644
+--- a/node_modules/realm/CMakeLists.txt
++++ b/node_modules/realm/CMakeLists.txt
+@@ -1,5 +1,43 @@
++# On macOS, search Homebrew for keg-only versions of Bison and Flex. Xcode does
++# not provide new enough versions for us to use.
++if (CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
++    execute_process(
++        COMMAND brew --prefix bison
++        RESULT_VARIABLE BREW_BISON
++        OUTPUT_VARIABLE BREW_BISON_PREFIX
++        OUTPUT_STRIP_TRAILING_WHITESPACE
++    )
++    if (BREW_BISON EQUAL 0 AND EXISTS "${BREW_BISON_PREFIX}")
++        message(STATUS "Found Bison keg installed by Homebrew at ${BREW_BISON_PREFIX}")
++        set(BISON_EXECUTABLE "${BREW_BISON_PREFIX}/bin/bison")
++    endif()
++
++    execute_process(
++        COMMAND brew --prefix flex
++        RESULT_VARIABLE BREW_FLEX
++        OUTPUT_VARIABLE BREW_FLEX_PREFIX
++        OUTPUT_STRIP_TRAILING_WHITESPACE
++    )
++    if (BREW_FLEX EQUAL 0 AND EXISTS "${BREW_FLEX_PREFIX}")
++        message(STATUS "Found Flex keg installed by Homebrew at ${BREW_FLEX_PREFIX}")
++        set(FLEX_EXECUTABLE "${BREW_FLEX_PREFIX}/bin/flex")
++    endif()
++endif()
++
+ # compiling for Node.js, need to set up toolchains before project() call
+-if(DEFINED CMAKE_JS_VERSION)
++if(CMAKE_SYSTEM_NAME STREQUAL "Android")
++    set(ANDROID ON)
++    set(APPLE OFF)
++    # Optimize for size vs. performance for Android. The has the following implications:
++    # - Add `-ffunction-sections` and `-fdata-sections`. This requires that `-Wl,-gc-sections` are used when creating
++    #   the final .so file.
++    # - `-fstrict-aliasing` is inherited from NDK r10e.
++    # - `-fomit-frame-pointer` is inherited from NDK r10e.
++    # - On some architectures char is unsigned by default. Make it signed
++    # - Compile with -Oz in Release because on Android we favor code size over performance
++    #
++    add_compile_options(-fdata-sections -ffunction-sections -fomit-frame-pointer -fsigned-char -fstrict-aliasing -funwind-tables -no-canonical-prefixes $<$<CONFIG:Release>:-Oz>)
++elseif(DEFINED CMAKE_JS_VERSION)
+     if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+         set(CMAKE_SYSTEM_VERSION 8.1)
+         if(CMAKE_GENERATOR_PLATFORM MATCHES "^[Ww][Ii][Nn]32$")
+@@ -46,7 +84,7 @@ endif()
+ option(REALM_JS_BUILD_CORE_FROM_SOURCE "Build Realm Core from source, as opposed to downloading prebuilt binaries" ON)
+ if(REALM_JS_BUILD_CORE_FROM_SOURCE)
+     set(REALM_BUILD_LIB_ONLY ON)
+-    set(REALM_ENABLE_SYNC ON)
++    set(REALM_ENABLE_SYNC OFF)
+
+     if(ANDROID)
+         set(REALM_ANDROID ON)
+diff --git a/node_modules/realm/build/Release/realm.node b/node_modules/realm/build/Release/realm.node
+deleted file mode 100755
+index 2aacfe0..0000000
+Binary files a/node_modules/realm/build/Release/realm.node and /dev/null differ
+diff --git a/node_modules/realm/src/node/node_init.cpp b/node_modules/realm/src/node/node_init.cpp
+index 2631a9a..ff33995 100644
+--- a/node_modules/realm/src/node/node_init.cpp
++++ b/node_modules/realm/src/node/node_init.cpp
+@@ -20,10 +20,10 @@
+ #include "node_init.hpp"
+ #include "napi.h"
+
+-#if !REALM_ENABLE_SYNC
+-#pragma comment( lib, "ws2_32.lib")
+-#pragma comment (lib, "crypt32");
+-#endif
++// #if !REALM_ENABLE_SYNC
++// #pragma comment( lib, "ws2_32.lib")
++// #pragma comment (lib, "crypt32");
++// #endif
+
+ #include "js_realm.hpp"

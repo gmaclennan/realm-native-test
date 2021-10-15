@@ -1,5 +1,5 @@
 diff --git a/node_modules/realm/CMakeLists.txt b/node_modules/realm/CMakeLists.txt
-index 2df55d0..6a328ca 100644
+index 2df55d0..fd79ba1 100644
 --- a/node_modules/realm/CMakeLists.txt
 +++ b/node_modules/realm/CMakeLists.txt
 @@ -1,5 +1,43 @@
@@ -47,35 +47,26 @@ index 2df55d0..6a328ca 100644
      if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
          set(CMAKE_SYSTEM_VERSION 8.1)
          if(CMAKE_GENERATOR_PLATFORM MATCHES "^[Ww][Ii][Nn]32$")
-@@ -46,7 +84,7 @@ endif()
- option(REALM_JS_BUILD_CORE_FROM_SOURCE "Build Realm Core from source, as opposed to downloading prebuilt binaries" ON)
- if(REALM_JS_BUILD_CORE_FROM_SOURCE)
-     set(REALM_BUILD_LIB_ONLY ON)
--    set(REALM_ENABLE_SYNC ON)
-+    set(REALM_ENABLE_SYNC OFF)
+diff --git a/node_modules/realm/cmake/NodeJSTargets.cmake b/node_modules/realm/cmake/NodeJSTargets.cmake
+index 7459dcb..49e1319 100644
+--- a/node_modules/realm/cmake/NodeJSTargets.cmake
++++ b/node_modules/realm/cmake/NodeJSTargets.cmake
+@@ -7,7 +7,17 @@ execute_process(COMMAND node -p "require('node-addon-api').include"
+ string(REPLACE "\"" "" NODE_ADDON_API_DIR ${NODE_ADDON_API_DIR})
  
-     if(ANDROID)
-         set(REALM_ANDROID ON)
-diff --git a/node_modules/realm/build/Release/realm.node b/node_modules/realm/build/Release/realm.node
-deleted file mode 100755
-index 2aacfe0..0000000
-Binary files a/node_modules/realm/build/Release/realm.node and /dev/null differ
-diff --git a/node_modules/realm/src/node/node_init.cpp b/node_modules/realm/src/node/node_init.cpp
-index 2631a9a..ff33995 100644
---- a/node_modules/realm/src/node/node_init.cpp
-+++ b/node_modules/realm/src/node/node_init.cpp
-@@ -20,10 +20,10 @@
- #include "node_init.hpp"
- #include "napi.h"
- 
--#if !REALM_ENABLE_SYNC
--#pragma comment( lib, "ws2_32.lib")
--#pragma comment (lib, "crypt32");
--#endif
-+// #if !REALM_ENABLE_SYNC
-+// #pragma comment( lib, "ws2_32.lib")
-+// #pragma comment (lib, "crypt32");
-+// #endif
- 
- #include "js_realm.hpp"
+ # Define an interface target with the cmake-js headers and libraries
+-add_library(NodeJS INTERFACE)
++add_library(NodeJS SHARED IMPORTED)
++
++set_target_properties( # Specifies the target library.
++                       NodeJS
++
++                       # Specifies the parameter you want to define.
++                       PROPERTIES IMPORTED_LOCATION
++
++                       # Provides the path to the library you want to import.
++                       ${NODE_BINARY} )
++
+ target_include_directories(NodeJS INTERFACE ${CMAKE_JS_INC} ${NODE_ADDON_API_DIR})
+ target_link_libraries(NodeJS INTERFACE ${CMAKE_JS_LIB})
  

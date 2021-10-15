@@ -1,5 +1,0 @@
-#!/bin/bash
-      # Helper script for Gradle to call node on macOS in case it is not found
-      export PATH=$PATH:/Users/gregor/.fnm/node-versions/v12.18.3/installation/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/Users/gregor/Dev/DdDev/realm-native-test/node_modules/nodejs-mobile-react-native/node_modules/.bin:/Users/gregor/Dev/DdDev/realm-native-test/node_modules/.bin:/Users/gregor/.pyenv/shims:/var/folders/nz/m59kq_f53ldft9j7htj367hc0000gn/T/fnm_multishell_31328_1634036420474/bin:/Library/Java/JavaVirtualMachines/adoptopenjdk-8.jdk/Contents/Home/bin:/usr/local/opt/openssl@1.1/bin:/Users/gregor/Library/Android/sdk/emulator:/Users/gregor/Library/Android/sdk/platform-tools:/Users/gregor/Library/Android/sdk/tools/bin:node_modules/.bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/MacGPG2/bin:/opt/X11/bin:/Library/Apple/usr/bin:/Applications/Wireshark.app/Contents/MacOS:/Users/gregor/.cargo/bin
-      node $@
-    
